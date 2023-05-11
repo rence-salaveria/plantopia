@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model UserAccount {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()"))
+  email     String   @unique
+  name      String?
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Garden    Garden[]
+
+  @@map("user_accounts")
+}
+
+model Garden {
+  id        String      @id @default(dbgenerated("uuid_generate_v4()"))
+  name      String
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  owner     UserAccount @relation(fields: [ownerId], references: [id])
+  ownerId   String
+  plants    Plant[]
+
+  @@map("gardens")
+}
+
+model Plant {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()"))
+  plantId   Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  garden    Garden   @relation(fields: [gardenId], references: [id])
+  gardenId  String
+
+  @@map("plants")
+}
